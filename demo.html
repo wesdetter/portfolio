@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Interactive Report Demo (Sample Data)</title>
+<style>
+:root{--bg:#F3F4F6;--surface:#FFFFFF;--ink:#14171C;--mute:#5B6470;--line:#DDE1E7;--gold:#D2AE2F;--goldink:#1B1600;--maroon:#8E2F34;--cell:#14171C;--g:#A9E6A3;--r:#F2858A;--gd:#1E7A34;--rd:#C0343A;
+ color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1216;--surface:#171B21;--ink:#ECEFF3;--mute:#98A2B0;--line:#2A313B;--maroon:#D2656B;--gd:#5BD17A;--rd:#FF7B80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1216;--surface:#171B21;--ink:#ECEFF3;--mute:#98A2B0;--line:#2A313B;--maroon:#D2656B;--gd:#5BD17A;--rd:#FF7B80;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.ribbon{background:var(--ink);color:var(--bg);font-size:13px;padding:7px 14px;text-align:center}
+.ribbon a{color:inherit}
+.filters{background:var(--gold);color:var(--goldink);display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end;padding:10px 16px}
+.filters b{font-size:15px;margin-right:auto;align-self:center}
+.filters label{display:flex;flex-direction:column;font-size:12px;font-weight:600;gap:2px}
+.filters select{min-width:104px;padding:5px 6px;border:1px solid #0003;border-radius:3px;background:#fff;color:#14171C;font:13px system-ui,sans-serif}
+.page{max-width:1240px;margin:0 auto;padding:14px 16px 40px}
+h1{font-size:22px;margin:4px 0 0}
+.sub{color:var(--mute);margin:2px 0 12px;font-size:13px}
+.top{display:flex;flex-wrap:wrap;gap:6px 26px;margin-bottom:12px}
+.top div{text-align:center}.top strong{display:block;font-size:15px}.top span{font-size:12px;color:var(--mute)}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:16px;text-align:center;padding:10px 8px}
+.kpi small{display:block;font-weight:700;font-size:12px;letter-spacing:.02em}
+.kpi b{display:block;font-size:22px;font-weight:600;color:var(--mute);margin:2px 0}
+.kpi i{font-style:normal;font-weight:600;font-size:13px;margin:0 6px}
+.up{color:var(--gd)}.dn{color:var(--rd)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px;min-width:0}
+.card h2{font-size:14px;margin:0 0 8px}
+.row{display:grid;gap:12px;margin-top:12px}
+.r1{grid-template-columns:1fr}.r2{grid-template-columns:1.5fr 1fr 1.2fr}.r3{grid-template-columns:1.2fr 1fr 1.2fr}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px;white-space:nowrap}
+th{background:#C9CCD1;color:#14171C;font-weight:600;padding:4px 6px;text-align:right}
+td{padding:3px 6px;text-align:right;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+td.g{background:var(--g);color:#14171C}td.r{background:var(--r);color:#14171C}
+tr.tot td{font-style:italic;font-weight:600;background:#C9CCD1;color:#14171C}
+svg text{fill:var(--mute);font:11px system-ui,sans-serif}
+.leg{display:flex;gap:14px;font-size:12px;color:var(--mute);justify-content:center;margin-top:4px;flex-wrap:wrap}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.health{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--gold);padding:14px 18px}
+.health h2{font-size:14px;margin:0 0 10px}
+.health p{margin:0 0 10px;font-size:13.5px}
+.health ul{margin:0;padding-left:18px;font-size:13.5px}.health li{margin:2px 0}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.r2,.r3{grid-template-columns:1fr}}
+.nav{display:flex;gap:4px;max-width:1240px;margin:0 auto;padding:10px 16px 0;overflow-x:auto}.nav button{font:600 14px system-ui,sans-serif;background:none;border:0;border-bottom:3px solid transparent;color:var(--mute);padding:8px 12px;cursor:pointer;white-space:nowrap}.nav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--gold)}.nav button:focus-visible,.filters select:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.k3{grid-template-columns:repeat(3,1fr)}.r4{grid-template-columns:1.6fr 1fr}.r2b{grid-template-columns:1.5fr 1fr}.tall{max-height:520px;overflow:auto}td.y{background:#EFE07A;color:#14171C}.filters select:disabled{opacity:.45}
+@media (max-width:900px){.k3{grid-template-columns:1fr}.r4,.r2b{grid-template-columns:1fr}}
+.k2{grid-template-columns:repeat(2,minmax(0,240px))}.r5{grid-template-columns:1fr 1fr}.bb{display:flex;align-items:center;gap:8px;font-size:12.5px;margin:4px 0}.bb span{width:112px;flex:none}.bb i{display:block;height:12px;border-radius:2px}.bb em{font-style:normal;color:var(--mute)}
+@media (max-width:900px){.k2{grid-template-columns:1fr 1fr}.r5{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="ribbon"><strong>Sample data.</strong> Every store, person, and number here is fictional. The layout and logic follow a report I built for a 108-location restaurant group. Change a filter to see everything update. <a href="index.html">Back to portfolio</a></div>
+<div class="filters" id="filters"><b>Sample Wings Co.</b></div>
+<nav class="nav" id="nav" aria-label="Report pages"></nav>
+<div class="page" id="pgS">
+<h1>Sales One-Pager</h1>
+<p class="sub">Are we growing vs last year, where, and is it traffic or check?</p>
+<div class="top" id="top"></div>
+<div class="kpis" id="kpis"></div>
+<div class="row r1"><div class="card"><h2>Sales by Week</h2><div id="chart"></div><div class="leg"><span><i style="background:var(--gold)"></i>2026 Sales</span><span><i style="background:var(--mute)"></i>2025 Sales</span></div></div></div>
+<div class="row r2">
+<div class="card scroll"><h2>Sales by District Operator</h2><div id="tDO"></div></div>
+<div class="card"><h2>Sales Mix</h2><div id="donut"></div></div>
+<div class="card scroll"><h2>Top 5 Stores by %</h2><div id="tTop"></div></div>
+</div>
+<div class="row r3">
+<div class="card scroll"><h2>Daypart</h2><div id="tDP"></div></div>
+<div class="card scroll"><h2>Day of Week</h2><div id="tDW"></div></div>
+<div class="card scroll"><h2>Bottom 5 Stores by %</h2><div id="tBot"></div></div>
+</div>
+<div class="health"><h2>HEALTH UPDATE</h2><div id="health"></div></div>
+</div>
+<div class="page" id="pgC" hidden>
+<h1>Scorecard</h1>
+<p class="sub">Every store’s sales vs last year in one list. Red = behind last year; start at the top of the red.</p>
+<div class="top" id="sTop"></div><div class="kpis" id="sK"></div>
+<div class="row r1"><div class="card scroll tall"><h2>Stores</h2><div id="sT"></div></div></div>
+<div class="health"><h2>HEALTH UPDATE</h2><div id="sH"></div></div>
+</div>
+<div class="page" id="pgK" hidden>
+<h1>Comps</h1>
+<p class="sub">Comped food as a share of sales: which stores, employees, and items are driving it. Order Mode and Daypart filters don’t apply here.</p>
+<div class="top" id="kTop"></div><div class="kpis k2" id="kK"></div>
+<div class="row r2b"><div class="card scroll tall"><h2>Stores</h2><div id="kT"></div></div><div class="card"><h2>Comps by Reason</h2><div id="kR"></div><h2 style="margin-top:14px">Items Comped</h2><div id="kI"></div></div></div>
+<div class="row r5"><div class="card scroll"><h2>Employee</h2><div id="kE"></div></div><div class="card scroll"><h2>Manager</h2><div id="kM"></div></div></div>
+<div class="health"><h2>HEALTH UPDATE</h2><div id="kH"></div></div>
+</div>
+<div class="page" id="pgM" hidden>
+<h1>Missing &amp; Incorrect</h1>
+<p class="sub">DoorDash missing and incorrect orders: how often, what it costs in error charges, and which stores. Order Mode and Daypart filters don’t apply here.</p>
+<div class="top" id="mTop"></div><div class="kpis k3" id="mK"></div>
+<div class="row r2b"><div class="card scroll tall"><h2>Stores</h2><div id="mT"></div></div><div class="card"><h2>M&amp;I % by Period</h2><div id="mC1"></div><h2 style="margin-top:14px">M&amp;I Error Charges by Period</h2><div id="mC2"></div></div></div>
+<div class="row r5"><div class="card scroll"><h2>District Operator</h2><div id="mDO"></div></div><div class="card scroll"><h2>State</h2><div id="mST"></div></div></div>
+<div class="health"><h2>HEALTH UPDATE</h2><div id="mH"></div></div>
+</div>
+<div class="page" id="pgD" hidden>
+<h1>Third-Party Delivery</h1>
+<p class="sub">How delivery apps are trending vs last year, which app drives it, and how much DoorDash downtime cost us.</p>
+<div class="top" id="dTop"></div>
+<div class="kpis k3" id="dK"></div>
+<div class="row r4"><div class="card"><h2>Sales by Day (last 14 days)</h2><div id="dC"></div></div><div class="card"><h2>Share of 3PD Sales</h2><div id="dP"></div></div></div>
+<div class="row r2b"><div class="card scroll tall"><h2>Stores</h2><div id="dT"></div></div><div class="card scroll"><h2>District Operator</h2><div id="dDO"></div><h2 style="margin-top:14px">Daypart</h2><div id="dDP"></div></div></div>
+<div class="health"><h2>HEALTH UPDATE</h2><div id="dH"></div></div>
+</div>
+<div class="page" id="pgO" hidden>
+<h1>Ops Scorecard</h1>
+<p class="sub">How each store scores on speed, mystery shop, and comps, and which stores need an ops visit. Order Mode and Daypart filters don’t apply here.</p>
+<div class="top" id="oTop"></div>
+<div class="kpis" id="oK"></div>
+<div class="row r2b"><div class="card scroll tall"><h2>Stores</h2><div id="oT"></div></div><div class="card scroll"><h2>Total Score Bands</h2><div id="oB"></div><h2 style="margin-top:14px">District Operator</h2><div id="oDO"></div><h2 style="margin-top:14px">State</h2><div id="oST"></div></div></div>
+<div class="health"><h2>HEALTH UPDATE</h2><div id="oH"></div></div>
+</div>
+<script>
+function R(s){return function(){s|=0;s=s+0x6D2B79F5|0;var t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+var rnd=R(11);
+var C=["Maple Ridge","Cedar Falls","Lakeview","Stone Creek","Harbor Point","Pine Hollow","Fox Run","Elm Park","Granite Bay","Willow Glen","Copper Hill","Summit","River Bend","Oak Terrace","Bright Water","Silver Lake","Red Mill","Cold Spring","Prairie View","Iron Gate","Sandy Ford","North Haven","Eagle Pass","Clover Field","Amber Falls","Birch Landing","Stag Run","Falcon Ridge","Mill Creek","Juniper","Wolf Point","Heron Bay","Timber Rock","Ash Grove","Quarry Hill","Dover Glen"];
+var ST=["OH","MI","IN","KY","PA"],DO=["Alex R.","Sam T.","Jordan K."],DP=["Lunch","Mid-Day","Dinner","Late Night"],DM=[.2,.18,.42,.2],MD=["Dine In","Takeout","Delivery"],MM=[.66,.2,.14],AV=[38,31,33];
+var W=44,rows=[],sh=[],J=[[],[]];
+C.forEach(function(c,i){var st=ST[(i*7+i%3)%5],d=i%3,size=1.3e6+rnd()*1.9e6,t=(rnd()-.5)*.16-.004;
+DP.forEach(function(p,a){MD.forEach(function(m,b){var s25=size*DM[a]*MM[b]*(1+(rnd()-.5)*.1),g=t+(b==2?.05:b==1?.015:-.01)+(a==3?.015:0),s26=s25*(1+g),v25=AV[b]*(1+(rnd()-.5)*.04),v26=v25*(1.02+(rnd()-.5)*.01);
+rows.push({n:c+", "+st,st:st,d:d,p:a,m:b,s:[s25,s26],c:[s25/v25,s26/v26]})})})});
+var sum=0;for(var w=0;w<W;w++){var v=1+.1*Math.sin(w/W*12.57)+(w==21?-.08:0)+(w>W-4?-.12:0);sh.push(v);sum+=v;J[0].push(1+(rnd()-.5)*.05);J[1].push(1+(rnd()-.5)*.05)}
+sh=sh.map(function(v){return v/sum});
+var SELS={};
+var F={State:["All"].concat(ST),DO:["All"].concat(DO),"Order Mode":["All"].concat(MD),Daypart:["All"].concat(DP)},sel={State:"All",DO:"All","Order Mode":"All",Daypart:"All"};
+var fb=document.getElementById("filters");
+Object.keys(F).forEach(function(k){var l=document.createElement("label");l.textContent=k;var s=document.createElement("select");F[k].forEach(function(o){var e=document.createElement("option");e.textContent=o;s.appendChild(e)});s.onchange=function(){sel[k]=s.value;render()};l.appendChild(s);SELS[k]=s;fb.appendChild(l)});
+function $(n){return"$"+Math.round(Math.abs(n)).toLocaleString("en-US")}
+function N(n){return Math.round(n).toLocaleString("en-US")}
+function P(x,d){d=d==null?1:d;return(x>=0?"":"-")+Math.abs(x*100).toFixed(d)+"%"}
+function SP(x){return(x>=0?"+":"")+P(x)}
+function SD(n){return(n<0?"(":"")+$(n)+(n<0?")":"")}
+function sum2(a,f){var o={s:[0,0],c:[0,0]};a.forEach(function(r){o.s[0]+=r.s[0];o.s[1]+=r.s[1];o.c[0]+=r.c[0];o.c[1]+=r.c[1]});return o}
+function yoy(o){return o.s[1]/o.s[0]-1}
+function cell(v,t){return'<td class="'+(v>=0?"g":"r")+'">'+t+"</td>"}
+function tbl(h,body,tot){return"<table><tr>"+h.map(function(x){return"<th>"+x+"</th>"}).join("")+"</tr>"+body+(tot||"")+"</table>"}
+function grp(a,key,names){return names.map(function(n,i){var o=sum2(a.filter(function(r){return r[key]===i}));o.n=n;return o}).filter(function(o){return o.s[0]>0})}
+function renderS(){
+var f=rows.filter(function(r){return(sel.State=="All"||r.st==sel.State)&&(sel.DO=="All"||DO[r.d]==sel.DO)&&(sel["Order Mode"]=="All"||MD[r.m]==sel["Order Mode"])&&(sel.Daypart=="All"||DP[r.p]==sel.Daypart)});
+var T=sum2(f),y=yoy(T),dS=T.s[1]-T.s[0],cY=T.c[1]/T.c[0]-1,A=[T.s[0]/T.c[0],T.s[1]/T.c[1]],aY=A[1]/A[0]-1;
+var dine=sum2(f.filter(function(r){return r.m==0})),off=sum2(f.filter(function(r){return r.m>0}));
+var mode=grp(f,"m",MD);var tm=mode.reduce(function(a,o){return a+o.s[1]},0);
+function mix(i){var o=mode.filter(function(x){return x.n==MD[i]})[0];return o?o.s[1]/tm:0}
+document.getElementById("top").innerHTML=[["Comp %","0.79%"],["Void %","0.82%"],["Promo %","0.35%"],["Dine In Mix %",P(mix(0))],["Delivery Mix %",P(mix(2))],["Takeout Mix %",P(mix(1))]].map(function(x){return"<div><strong>"+x[1]+"</strong><span>"+x[0]+"</span></div>"}).join("");
+function k(l,v,a,b,pos){return'<div class="kpi"><small>'+l+"</small><b>"+v+'</b><i class="'+(pos>=0?"up":"dn")+'">'+(pos>=0?"+":"")+a+'</i><i class="'+(pos>=0?"up":"dn")+'">'+b+"</i></div>"}
+document.getElementById("kpis").innerHTML=k("NET SALES",$(T.s[1]),P(y),SD(dS),y)+k("CHECKS",N(T.c[1]),P(cY),N(T.c[1]-T.c[0]),cY)+k("AVG CHECK","$"+A[1].toFixed(2),P(aY),"$"+(A[1]-A[0]).toFixed(2),aY)+k("DINE IN",$(dine.s[1]),P(yoy(dine)),SD(dine.s[1]-dine.s[0]),yoy(dine))+k("OFF PREMISE",$(off.s[1]),P(yoy(off)),SD(off.s[1]-off.s[0]),yoy(off));
+// chart
+var a25=sh.map(function(v,i){return T.s[0]*v*J[0][i]}),a26=sh.map(function(v,i){return T.s[1]*v*J[1][i]}),all=a25.concat(a26),mx=Math.max.apply(null,all)*1.08,mn=Math.min.apply(null,all)*.9;
+function pl(a){return a.map(function(v,i){return(30+i*(600/(W-1))).toFixed(1)+","+(150-(v-mn)/(mx-mn)*130).toFixed(1)}).join(" ")}
+document.getElementById("chart").innerHTML='<svg viewBox="0 0 640 175" width="100%" role="img" aria-label="Weekly sales, 2026 versus 2025"><text x="0" y="24">'+$(mx)+'</text><text x="0" y="152">'+$(mn)+'</text><line x1="30" x2="630" y1="156" y2="156" stroke="var(--line)"/><polyline points="'+pl(a25)+'" fill="none" stroke="var(--mute)" stroke-width="2" stroke-dasharray="3 3"/><polyline points="'+pl(a26)+'" fill="none" stroke="var(--gold)" stroke-width="2.6"/><text x="30" y="171">Week 1</text><text x="290" y="171">Week 22</text><text x="590" y="171">Week 44</text></svg>';
+// tables
+var H=["","2026 Sales","2025 Sales","YoY %","YoY $"];
+function line(o,n){return"<tr><td>"+n+"</td><td>"+$(o.s[1])+"</td><td>"+$(o.s[0])+"</td>"+cell(yoy(o),P(yoy(o)))+cell(dS<0&&0,"")+"</tr>"}
+function L(o){var d=o.s[1]-o.s[0];return"<tr><td>"+o.n+"</td><td>"+$(o.s[1])+"</td><td>"+$(o.s[0])+"</td>"+cell(yoy(o),P(yoy(o)))+cell(d,SD(d))+"</tr>"}
+var totRow='<tr class="tot"><td>Total</td><td>'+$(T.s[1])+"</td><td>"+$(T.s[0])+"</td><td>"+P(y)+"</td><td>"+SD(dS)+"</td></tr>";
+H[0]="Group";var h2=["Group","2026 Sales","2025 Sales","YoY %","YoY $"];
+var gdo=grp(f,"d",DO),gdp=grp(f,"p",DP);
+document.getElementById("tDO").innerHTML=tbl(["DO","2026 Sales","2025 Sales","YoY %","YoY $"],gdo.map(L).join(""),totRow);
+document.getElementById("tDP").innerHTML=tbl(["Daypart","2026 Sales","2025 Sales","YoY %","YoY $"],gdp.map(L).join(""),totRow);
+var dw=[1.0,.95,.97,1.1,1.2,1.35,1.18],ds=dw.reduce(function(a,b){return a+b}),dn=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],dj=[.012,-.01,.008,-.02,.026,.01,.018];
+document.getElementById("tDW").innerHTML=tbl(["Day","2026 Sales","2025 Sales","YoY %","YoY $"],dw.map(function(v,i){var s25=T.s[0]*v/ds,s26=T.s[1]*v/ds*(1+dj[i]);return L({n:dn[i],s:[s25,s26]})}).join(""),totRow);
+var bySt={};f.forEach(function(r){var o=bySt[r.n]||(bySt[r.n]={n:r.n,s:[0,0],c:[0,0]});o.s[0]+=r.s[0];o.s[1]+=r.s[1];o.c[0]+=r.c[0];o.c[1]+=r.c[1]});
+var sa=Object.keys(bySt).map(function(n){return bySt[n]}).sort(function(a,b){return yoy(b)-yoy(a)});
+function S5(a){return tbl(["Store","2026 Sales","2025 Sales","YoY %"],a.map(function(o){return"<tr><td>"+o.n+"</td><td>"+$(o.s[1])+"</td><td>"+$(o.s[0])+"</td>"+cell(yoy(o),P(yoy(o)))+"</tr>"}).join(""))}
+var top=sa.slice(0,5),bot=sa.slice(-5).reverse();
+document.getElementById("tTop").innerHTML=S5(top);document.getElementById("tBot").innerHTML=S5(bot);
+// donut
+var col=["var(--gold)","var(--maroon)","var(--ink)"],off0=0,seg="";
+mode.forEach(function(o){var fr=o.s[1]/tm,L2=fr*251.3;seg+='<circle r="40" cx="60" cy="60" fill="none" stroke="'+col[MD.indexOf(o.n)]+'" stroke-width="16" stroke-dasharray="'+L2.toFixed(1)+" "+(251.3-L2).toFixed(1)+'" stroke-dashoffset="'+(-off0).toFixed(1)+'" transform="rotate(-90 60 60)"/>';off0+=L2});
+document.getElementById("donut").innerHTML='<svg viewBox="0 0 120 120" width="100%" style="max-width:190px;display:block;margin:0 auto" role="img" aria-label="Sales mix by order mode">'+seg+"</svg><div class=\"leg\">"+mode.map(function(o){return"<span><i style=\"background:"+col[MD.indexOf(o.n)]+"\"></i>"+o.n+" "+P(o.s[1]/tm)+"</span>"}).join("")+"</div>";
+// health
+var st=y>.02?"HEALTHY":y>.005?"STEADY":y>-.005?"FLAT":y>-.02?"SOFT":"DECLINING";
+var ahead=sa.filter(function(o){return yoy(o)>0}).length;
+var dpS=gdp.slice().sort(function(a,b){return(b.s[1]-b.s[0])-(a.s[1]-a.s[0])}),best=dpS[0],worst=dpS[dpS.length-1];
+function nm(a,n){return a.slice(0,n).map(function(o){return o.n+" ("+SP(yoy(o))+")"}).join(", ")}
+var hl=["<p>"+st+" | Sales are "+(y>=0?"up ":"down ")+P(Math.abs(y),2)+" vs last year ("+(dS<0?"-":"+")+$(dS)+") on "+$(T.s[1])+" in sales across "+sa.length+" stores, through Nov 7.</p><ul>",
+"<li>Traffic vs. check: "+(cY<0&&aY>0?"Traffic is the issue. Checks are down "+P(Math.abs(cY))+" while average check is up "+P(aY)+", so a higher check average is covering for fewer guests.":cY>=0&&aY>=0?"Both are helping. Checks are up "+P(cY)+" and average check is up "+P(aY)+".":"Checks are "+(cY>=0?"up ":"down ")+P(Math.abs(cY))+" and average check is "+(aY>=0?"up ":"down ")+P(Math.abs(aY))+".")+"</li>",
+"<li>Channels: Dine-in is "+SP(yoy(dine))+" and off-premise is "+SP(yoy(off))+" vs last year.</li>",
+"<li>Stores: "+ahead+" of "+sa.length+" stores are ahead of last year.</li>",
+"<li>Top 5: "+nm(top,5)+"</li>","<li>Needs attention: "+nm(bot,4)+"</li>",
+"<li>Dayparts: "+best.n+" is the strongest ("+(best.s[1]-best.s[0]>=0?"+":"-")+$(best.s[1]-best.s[0])+") and "+worst.n+" is the biggest "+(worst.s[1]-worst.s[0]<0?"drag "+SD(worst.s[1]-worst.s[0]):"smallest gain")+".</li></ul>"];
+document.getElementById("health").innerHTML=hl.join("");
+}
+var SM={};rows.forEach(function(r){SM[r.n]=SM[r.n]||{n:r.n,st:r.st,d:r.d}});
+var PL={},DT={},OP={};Object.keys(SM).forEach(function(n){var a=.72+rnd()*.08,b=.17+rnd()*.06;PL[n]=[a,b,1-a-b];DT[n]=Math.round(rnd()*rnd()*140);var s20=.62+rnd()*.35;OP[n]={s20:s20,s25:Math.min(.995,s20+.04+rnd()*.04),o30:Math.max(.003,(1-s20)*.18*(.6+rnd())),my:.54+rnd()*.34,cm:.004+rnd()*.011,mi:.012+rnd()*.07,ml:.8+rnd()*.6}});
+function pC(x){return x<.007?4:x<.009?3:x<.012?2:1}
+function pS(x){return x>=.85?4:x>=.75?3:x>=.65?2:1}
+function pM(x){return x>=.7?4:x>=.62?3:x>=.56?2:1}
+function TS(o){return(pC(o.cm)+pS(o.s20)+pM(o.my))/3}
+function cS(x){return x>=.85?"g":x<.75?"r":"y"}
+function cM(x){return x>=.72?"g":x<.65?"r":"y"}
+function cC(x){return x<=.006?"g":x>=.01?"r":"y"}
+function cT(x){return x>=3?"g":x<2.1?"r":"y"}
+function cc(c,t){return'<td class="'+c+'">'+t+"</td>"}
+function kk(l,v){return'<div class="kpi"><small>'+l+"</small><b>"+v+"</b></div>"}
+function topRow(a){return a.map(function(x){return"<div><strong>"+x[1]+"</strong><span>"+x[0]+"</span></div>"}).join("")}
+function LR(o){var d=o.s[1]-o.s[0];return"<tr><td>"+o.n+"</td><td>"+$(o.s[1])+"</td><td>"+$(o.s[0])+"</td>"+cell(yoy(o),P(yoy(o)))+cell(d,SD(d))+"</tr>"}
+function lc(a,b,lab,fm){fm=fm||$;var all=a.concat(b),mx=Math.max.apply(null,all)*1.08,mn=Math.min.apply(null,all)*.9,n=a.length;function pl(v){return v.map(function(x,i){return(30+i*(600/(n-1))).toFixed(1)+","+(150-(x-mn)/(mx-mn)*130).toFixed(1)}).join(" ")}return'<svg viewBox="0 0 640 175" width="100%" role="img" aria-label="Sales trend, this year versus last year"><text x="0" y="24">'+fm(mx)+'</text><text x="0" y="152">'+fm(mn)+'</text><line x1="30" x2="630" y1="156" y2="156" stroke="var(--line)"/><polyline points="'+pl(b)+'" fill="none" stroke="var(--mute)" stroke-width="2" stroke-dasharray="3 3"/><polyline points="'+pl(a)+'" fill="none" stroke="var(--gold)" stroke-width="2.6"/><text x="30" y="171">'+lab[0]+'</text><text x="560" y="171">'+lab[1]+"</text></svg>"}
+function donut(parts,names,cols){var t=parts.reduce(function(a,b){return a+b},0),o=0,s="";parts.forEach(function(p,i){var l=p/t*251.3;s+='<circle r="40" cx="60" cy="60" fill="none" stroke="'+cols[i]+'" stroke-width="16" stroke-dasharray="'+l.toFixed(1)+" "+(251.3-l).toFixed(1)+'" stroke-dashoffset="'+(-o).toFixed(1)+'" transform="rotate(-90 60 60)"/>';o+=l});return'<svg viewBox="0 0 120 120" width="100%" style="max-width:190px;display:block;margin:0 auto" role="img" aria-label="Share of sales by app">'+s+'</svg><div class="leg">'+parts.map(function(p,i){return'<span><i style="background:'+cols[i]+'"></i>'+names[i]+" "+P(p/t)+"</span>"}).join("")+"</div>"}
+function nmL(a,n){return a.slice(0,n).map(function(o){return o.n+" ("+SP(yoy(o))+")"}).join(", ")}
+function dRender(){
+var f=rows.filter(function(r){return r.m==2&&(sel.State=="All"||r.st==sel.State)&&(sel.DO=="All"||DO[r.d]==sel.DO)&&(sel.Daypart=="All"||DP[r.p]==sel.Daypart)});
+var T=sum2(f),y=yoy(T),dS=T.s[1]-T.s[0],cY=T.c[1]/T.c[0]-1,A=[T.s[0]/T.c[0],T.s[1]/T.c[1]],aY=A[1]/A[0]-1;
+var pf=[0,0,0],names={};f.forEach(function(r){names[r.n]=1;for(var k=0;k<3;k++)pf[k]+=r.s[1]*PL[r.n][k]});
+var dt=Object.keys(names).reduce(function(a,n){return a+DT[n]},0);
+document.getElementById("dTop").innerHTML=topRow([["DoorDash Sales",$(pf[0])],["UberEats Sales",$(pf[1])],["GrubHub Sales",$(pf[2])],["3PD sales vs LY",SP(y)],["DD downtime (min)",N(dt)]]);
+function k(l,v,a,b,p){return'<div class="kpi"><small>'+l+"</small><b>"+v+'</b><i class="'+(p>=0?"up":"dn")+'">'+(p>=0?"+":"")+a+'</i><i class="'+(p>=0?"up":"dn")+'">'+b+"</i></div>"}
+document.getElementById("dK").innerHTML=k("NET SALES",$(T.s[1]),P(y),SD(dS),y)+k("CHECKS",N(T.c[1]),P(cY),N(T.c[1]-T.c[0]),cY)+k("AVG CHECK","$"+A[1].toFixed(2),P(aY),"$"+(A[1]-A[0]).toFixed(2),aY);
+var dw=[1,.92,.95,1.05,1.2,1.4,1.25],a26=[],a25=[];for(var i=0;i<14;i++){var b=T.s[1]/(W*7)*dw[i%7]*(1+(J[1][i]-1)*3);a26.push(b);a25.push(b/(1+y)*(1+(J[0][i]-1)*3))}
+document.getElementById("dC").innerHTML=lc(a26,a25,["Day 1","Day 14"])+'<div class="leg"><span><i style="background:var(--gold)"></i>2026 3PD Sales</span><span><i style="background:var(--mute)"></i>2025 3PD Sales</span></div>';
+document.getElementById("dP").innerHTML=donut(pf,["DoorDash","UberEats","GrubHub"],["#3B82F6","var(--ink)","#F97316"]);
+var by={};f.forEach(function(r){var o=by[r.n]||(by[r.n]={n:r.n,s:[0,0],c:[0,0]});o.s[0]+=r.s[0];o.s[1]+=r.s[1];o.c[0]+=r.c[0];o.c[1]+=r.c[1]});
+var sa=Object.keys(by).map(function(n){return by[n]}).sort(function(a,b){return yoy(b)-yoy(a)});
+var tot='<tr class="tot"><td>Total</td><td>'+$(T.s[1])+"</td><td>"+$(T.s[0])+"</td><td>"+P(y)+"</td><td>"+SD(dS)+"</td></tr>";
+var hd=["","2026 Sales","2025 Sales","YoY %","YoY $"];function H(x){var h=hd.slice();h[0]=x;return h}
+document.getElementById("dT").innerHTML=tbl(H("Store"),sa.map(LR).join(""),tot);
+document.getElementById("dDO").innerHTML=tbl(H("DO"),grp(f,"d",DO).map(LR).join(""),tot);
+document.getElementById("dDP").innerHTML=tbl(H("Daypart"),grp(f,"p",DP).map(LR).join(""),tot);
+var st=y>.04?"HEALTHY":y>.01?"STEADY":y>-.01?"FLAT":"SOFT",ahead=sa.filter(function(o){return yoy(o)>0}).length,pt=pf[0]+pf[1]+pf[2];
+document.getElementById("dH").innerHTML="<p>"+st+" | Third-party delivery sales are "+(y>=0?"up ":"down ")+P(Math.abs(y))+" vs last year ("+(dS<0?"-":"+")+$(dS)+") on "+$(T.s[1])+" across "+sa.length+" stores.</p><ul><li>Orders vs. check: Orders are "+(cY>=0?"up ":"down ")+P(Math.abs(cY))+" and the average delivery check is "+(aY>=0?"up ":"down ")+P(Math.abs(aY))+" vs last year.</li><li>By app: DoorDash "+P(pf[0]/pt,0)+", UberEats "+P(pf[1]/pt,0)+", GrubHub "+P(pf[2]/pt,0)+" of 3PD sales.</li><li>Stores: "+ahead+" of "+sa.length+" stores are ahead of last year on delivery.</li><li>Top 5: "+nmL(sa,5)+"</li><li>Needs attention: "+nmL(sa.slice().reverse(),4)+"</li><li>DoorDash downtime: DoorDash was down "+N(dt)+" minutes, which is time guests could not order.</li></ul>"}
+function og(list,key){var m={};list.forEach(function(s){var k=key(s),o=m[k]||(m[k]={n:k,sa:0,cm:0,s20:0,my:0,sc:0});o.sa+=s.sa;o.cm+=s.o.cm*s.sa;o.s20+=s.o.s20*s.sa;o.my+=s.o.my*s.sa;o.sc+=s.sc*s.sa});return Object.keys(m).sort().map(function(k){var o=m[k];return{n:k,sa:o.sa,cm:o.cm/o.sa,s20:o.s20/o.sa,my:o.my/o.sa,sc:o.sc/o.sa}})}
+function oRow(o){return"<tr><td>"+o.n+"</td><td>"+$(o.sa)+"</td>"+cc(cC(o.cm),P(o.cm,2))+cc(cS(o.s20),P(o.s20))+cc(cM(o.my),P(o.my))+cc(cT(o.sc),o.sc.toFixed(2))+"</tr>"}
+function oRender(){
+var f=Object.keys(SM).map(function(n){return SM[n]}).filter(function(s){return(sel.State=="All"||s.st==sel.State)&&(sel.DO=="All"||DO[s.d]==sel.DO)});
+var sales={};rows.forEach(function(r){sales[r.n]=(sales[r.n]||0)+r.s[1]});
+f.forEach(function(s){s.o=OP[s.n];s.sa=sales[s.n];s.sc=TS(s.o)});
+var tot=f.reduce(function(a,s){return a+s.sa},0);function wa(k){return f.reduce(function(a,s){return a+s.o[k]*s.sa},0)/tot}
+var s20=wa("s20"),s25=wa("s25"),o30=wa("o30"),my=wa("my"),cm=wa("cm");
+document.getElementById("oTop").innerHTML=topRow([["Comp %",P(cm,2)],["SOS % Under 30",P(1-o30,2)]]);
+document.getElementById("oK").innerHTML=kk("NET SALES",$(tot))+kk("UNDER 20 MIN",P(s20,2))+kk("UNDER 25 MIN",P(s25,2))+kk("OVER 30 MIN",P(o30,2))+kk("MYSTERY SHOP",P(my,2));
+var hd=["Store","Sales","Comp %","SOS % 0-20 Min","Mystery Shop %","Total Score"];
+var srt=f.slice().sort(function(a,b){return b.sa-a.sa});
+document.getElementById("oT").innerHTML=tbl(hd,srt.map(function(s){return oRow({n:s.n,sa:s.sa,cm:s.o.cm,s20:s.o.s20,my:s.o.my,sc:s.sc})}).join(""));
+var bn=[["0 - 2","r",0],["2.1 - 2.99","y",0],["3 - 3.49","g",0],["3.5 - 4","g",0]];f.forEach(function(s){bn[s.sc<2.1?0:s.sc<3?1:s.sc<3.5?2:3][2]++});
+document.getElementById("oB").innerHTML=tbl(["Score","Stores"],bn.map(function(b){return"<tr>"+cc(b[1],b[0])+"<td>"+b[2]+"</td></tr>"}).join(""));
+var h2=["","Sales","Comp %","SOS % 0-20","Mystery %","Score"],hh=function(x){var h=h2.slice();h[0]=x;return h};
+document.getElementById("oDO").innerHTML=tbl(hh("DO"),og(f,function(s){return DO[s.d]}).map(oRow).join(""));
+document.getElementById("oST").innerHTML=tbl(hh("State"),og(f,function(s){return s.st}).map(oRow).join(""));
+var slow=f.slice().sort(function(a,b){return b.o.o30-a.o.o30}).slice(0,4),lo=f.slice().sort(function(a,b){return a.o.my-b.o.my}).slice(0,4),hi=f.slice().sort(function(a,b){return b.o.my-a.o.my}).slice(0,4);
+function L2(a,k){return a.map(function(s){return s.n+" ("+P(s.o[k])+")"}).join(", ")}
+document.getElementById("oH").innerHTML="<p>OPS | "+P(s20)+" of orders went out in under 20 minutes and "+P(o30)+" took over 30. Mystery shop is "+P(my)+" and comps are "+P(cm,2)+" of sales.</p><ul><li>Score bands: "+bn.map(function(b){return b[0]+": "+b[2]}).join(", ")+".</li><li>Slowest, % over 30 min: "+L2(slow,"o30")+"</li><li>Lowest mystery shop: "+L2(lo,"my")+"</li><li>Best mystery shop: "+L2(hi,"my")+"</li></ul>"}
+var pg=0,PG=["pgS","pgC","pgD","pgK","pgM","pgO"],NM=["Sales One-Pager","Scorecard","Third-Party Delivery","Comps","Missing & Incorrect","Ops Scorecard"],OFF=[[],[],["Order Mode"],["Order Mode","Daypart"],["Order Mode","Daypart"],["Order Mode","Daypart"]];
+function KP(l,v,a,b,p){return'<div class="kpi"><small>'+l+"</small><b>"+v+'</b><i class="'+(p>=0?"up":"dn")+'">'+(p>=0?"+":"")+a+'</i><i class="'+(p>=0?"up":"dn")+'">'+b+"</i></div>"}
+function wsum(list,k){return list.reduce(function(a,s){return a+s.sa*OP[s.n][k]},0)/list.reduce(function(a,s){return a+s.sa},0)}
+function scRender(){
+var f=rows.filter(function(r){return(sel.State=="All"||r.st==sel.State)&&(sel.DO=="All"||DO[r.d]==sel.DO)&&(sel["Order Mode"]=="All"||MD[r.m]==sel["Order Mode"])&&(sel.Daypart=="All"||DP[r.p]==sel.Daypart)});
+var T=sum2(f),y=yoy(T),dS=T.s[1]-T.s[0],cY=T.c[1]/T.c[0]-1,A=[T.s[0]/T.c[0],T.s[1]/T.c[1]],aY=A[1]/A[0]-1;
+var dine=sum2(f.filter(function(r){return r.m==0})),off=sum2(f.filter(function(r){return r.m>0})),dl=sum2(f.filter(function(r){return r.m==2})),tk=sum2(f.filter(function(r){return r.m==1}));
+var by={};f.forEach(function(r){var o=by[r.n]||(by[r.n]={n:r.n,sa:0,s:[0,0],c:[0,0]});o.sa+=r.s[1];o.s[0]+=r.s[0];o.s[1]+=r.s[1];o.c[0]+=r.c[0];o.c[1]+=r.c[1]});
+var sa=Object.keys(by).map(function(n){return by[n]}),cm=wsum(sa,"cm");
+document.getElementById("sTop").innerHTML=topRow([["Comp %",P(cm,2)],["Void %","0.81%"],["Dine In Mix %",P(dine.s[1]/T.s[1])],["Delivery Mix %",P(dl.s[1]/T.s[1])],["Takeout Mix %",P(tk.s[1]/T.s[1])]]);
+document.getElementById("sK").innerHTML=KP("NET SALES",$(T.s[1]),P(y),SD(dS),y)+KP("CHECKS",N(T.c[1]),P(cY),N(T.c[1]-T.c[0]),cY)+KP("AVG CHECK","$"+A[1].toFixed(2),P(aY),"$"+(A[1]-A[0]).toFixed(2),aY)+KP("DINE IN",$(dine.s[1]),P(yoy(dine)),SD(dine.s[1]-dine.s[0]),yoy(dine))+KP("OFF PREMISE",$(off.s[1]),P(yoy(off)),SD(off.s[1]-off.s[0]),yoy(off));
+var srt=sa.slice().sort(function(a,b){return b.sa-a.sa});
+document.getElementById("sT").innerHTML=tbl(["Store","2026 Sales","2025 Sales","Sales YoY %","Checks YoY %","2026 Avg Check","Avg Check YoY %","Comp %"],srt.map(function(o){var cy=o.c[1]/o.c[0]-1,a0=o.s[0]/o.c[0],a1=o.s[1]/o.c[1],ay=a1/a0-1;return"<tr><td>"+o.n+"</td><td>"+$(o.s[1])+"</td><td>"+$(o.s[0])+"</td>"+cell(yoy(o),P(yoy(o)))+cell(cy,P(cy))+"<td>$"+a1.toFixed(2)+"</td>"+cell(ay,P(ay))+cc(cC(OP[o.n].cm),P(OP[o.n].cm,2))+"</tr>"}).join(""));
+var yo=sa.slice().sort(function(a,b){return yoy(b)-yoy(a)}),ahead=yo.filter(function(o){return yoy(o)>0}).length,st=y>.02?"HEALTHY":y>.005?"STEADY":y>-.005?"FLAT":y>-.02?"SOFT":"DECLINING";
+document.getElementById("sH").innerHTML="<p>"+st+" | Sales are "+(y>=0?"up ":"down ")+P(Math.abs(y),2)+" vs last year ("+(dS<0?"-":"+")+$(dS)+") on "+$(T.s[1])+" across "+sa.length+" stores.</p><ul><li>Traffic vs. check: Checks are "+(cY>=0?"up ":"down ")+P(Math.abs(cY))+" and average check is "+(aY>=0?"up ":"down ")+P(Math.abs(aY))+(cY<0&&aY>0?", so a higher check average is covering for fewer guests.":".")+"</li><li>Stores: "+ahead+" of "+sa.length+" stores are ahead of last year.</li><li>Start at the top of the red: "+nmL(yo.slice().reverse(),5)+"</li><li>Best performers: "+nmL(yo,3)+"</li></ul>"}
+var RS=[["Service Comp",.33],["Food Comp",.21],["Kitchen Mistake",.13],["Walk Out",.08],["No Show",.07],["Complaint",.06],["Drink Comp",.05],["Guest Recovery",.04],["Server Error",.03]],IT=[["10 Wings",.22],["Sampler Platter",.19],["Boneless Bundle",.14],["Burger Combo",.12],["20 Wings",.1],["Wrap",.08],["Fries",.06],["Salad",.05]],EM=[["AM Cashier 1",.14],["AM Cashier 2",.11],["PM Cashier 1",.1],["PM Cashier 2",.09],["PM Bar",.08],["AM Bar",.07],["Host 1",.06],["Host 2",.05]],MG=[["Taylor M.",.12],["Casey L.",.11],["Morgan P.",.1],["Drew S.",.09],["Riley B.",.09],["Jamie F.",.08],["Quinn H.",.07],["Avery D.",.06]];
+function bars(a,tot,col){var mx=a[0][1];return a.map(function(x){return'<div class="bb"><span>'+x[0]+'</span><i style="width:'+(x[1]/mx*60).toFixed(0)+'%;background:'+col+'"></i><em>'+$(tot*x[1])+"</em></div>"}).join("")}
+function cRender(){
+var f=Object.keys(SM).map(function(n){return SM[n]}).filter(function(s){return(sel.State=="All"||s.st==sel.State)&&(sel.DO=="All"||DO[s.d]==sel.DO)});
+var sales={};rows.forEach(function(r){sales[r.n]=(sales[r.n]||0)+r.s[1]});
+f.forEach(function(s){s.sa=sales[s.n];s.cd=s.sa*OP[s.n].cm});
+var tot=f.reduce(function(a,s){return a+s.sa},0),cd=f.reduce(function(a,s){return a+s.cd},0),cp=cd/tot;
+document.getElementById("kTop").innerHTML=topRow([["Total Sales",$(tot)],["Void %","0.75%"],["Promo %","0.38%"],["Blazin Rewards %","4.24%"],["Employee Meal %","0.27%"]]);
+document.getElementById("kK").innerHTML=kk("COMPS $",$(cd))+kk("COMPS %",P(cp,2));
+var srt=f.slice().sort(function(a,b){return b.cd-a.cd});
+document.getElementById("kT").innerHTML=tbl(["Store","Comps","Comp %"],srt.map(function(s){return"<tr><td>"+s.n+"</td><td>"+$(s.cd)+"</td>"+cc(cC(OP[s.n].cm),P(OP[s.n].cm,2))+"</tr>"}).join(""));
+document.getElementById("kR").innerHTML=bars(RS,cd,"#3B82F6");document.getElementById("kI").innerHTML=bars(IT,cd*.6,"#3B82F6");
+document.getElementById("kE").innerHTML=tbl(["Employee","Comps"],EM.map(function(x){return"<tr><td>"+x[0]+"</td><td>"+$(cd*x[1]*.5)+"</td></tr>"}).join(""));
+document.getElementById("kM").innerHTML=tbl(["Manager","Comps"],MG.map(function(x){return"<tr><td>"+x[0]+"</td><td>"+$(cd*x[1]*.5)+"</td></tr>"}).join(""));
+var hi=f.slice().sort(function(a,b){return OP[b.n].cm-OP[a.n].cm}).slice(0,4),lo=hi.length?f.slice().sort(function(a,b){return OP[a.n].cm-OP[b.n].cm}).slice(0,4):[],above=f.filter(function(s){return OP[s.n].cm>cp}).length;
+function Lc(a){return a.map(function(s){return s.n+" ("+P(OP[s.n].cm,2)+")"}).join(", ")}
+document.getElementById("kH").innerHTML="<p>COMPS | "+$(cd)+" comped, "+P(cp,2)+" of sales.</p><ul><li>Stores: "+above+" of "+f.length+" stores are above that rate.</li><li>Highest 4: "+Lc(hi)+"</li><li>Lowest 4: "+Lc(lo)+"</li><li>Top reason: "+RS[0][0]+" ("+$(cd*RS[0][1])+", "+P(RS[0][1],0)+" of the total).</li><li>Top employee: "+EM[0][0]+" ("+$(cd*EM[0][1]*.5)+").</li><li>Top item: "+IT[0][0]+" ("+$(cd*.6*IT[0][1])+").</li></ul>"}
+function mg(list,key){var m={};list.forEach(function(s){var k=key(s),o=m[k]||(m[k]={n:k,or:0,mo:0,orL:0,moL:0});o.or+=s.or;o.mo+=s.mo;o.orL+=s.orL;o.moL+=s.moL});return Object.keys(m).sort().map(function(k){return m[k]})}
+function mRow(o){var r=o.mo/o.or,rl=o.moL/o.orL;return"<tr><td>"+o.n+"</td>"+"<td>"+P(r,2)+"</td><td>"+P(rl,2)+"</td>"+cell(rl-r,(rl-r>=0?"+":"")+P(rl-r,2))+"<td>"+$(o.mo*7.4)+"</td><td>"+$(o.moL*7.4)+"</td></tr>"}
+function mRender(){
+var ms={};rows.forEach(function(r){if(r.m!=2||(sel.State!="All"&&r.st!=sel.State)||(sel.DO!="All"&&DO[r.d]!=sel.DO))return;var o=ms[r.n]||(ms[r.n]={n:r.n,st:r.st,d:r.d,or:0,orL:0});o.or+=r.c[1];o.orL+=r.c[0]});
+var f=Object.keys(ms).map(function(n){var o=ms[n],p=OP[n];o.mo=o.or*p.mi;o.moL=o.orL*p.mi*p.ml;return o});
+var T=f.reduce(function(a,o){a.or+=o.or;a.mo+=o.mo;a.orL+=o.orL;a.moL+=o.moL;return a},{or:0,mo:0,orL:0,moL:0}),r=T.mo/T.or,rl=T.moL/T.orL,ec=T.mo*7.4,el=T.moL*7.4;
+document.getElementById("mTop").innerHTML=topRow([["M&I % last year",P(rl,2)],["M&I % change vs LY",(r-rl>=0?"+":"")+P(r-rl,2)],["Error charges vs LY",SD(ec-el)],["M&I orders vs LY",P(T.mo/T.moL-1)]]);
+document.getElementById("mK").innerHTML=KP("M&I %",P(r,2),(r-rl>=0?"+":"")+P(r-rl,2),"",rl-r)+KP("ERROR CHARGES",$(ec),P(ec/el-1),SD(ec-el),el-ec)+KP("TOTAL M&I ORDERS",N(T.mo),P(T.mo/T.moL-1),N(T.mo-T.moL),T.moL-T.mo);
+var srt=f.slice().sort(function(a,b){return a.n<b.n?-1:1});
+document.getElementById("mT").innerHTML=tbl(["Store","M&I %","LY M&I %","+/- Rate","Error Charges","LY Error"],srt.map(mRow).join(""));
+var pa=[1,.93,1.02,1.05,.98,1.12,.95,.9,1.06,1,.88,.97],pb=[1.04,1,.96,1.08,1.02,1.1,1,.94,1.03,1.05,1,.99],pf=function(v){return P(v,2)};
+var leg='<div class="leg"><span><i style="background:var(--gold)"></i>2026</span><span><i style="background:var(--mute)"></i>2025</span></div>';
+document.getElementById("mC1").innerHTML=lc(pa.map(function(v){return r*v}),pb.map(function(v){return rl*v}),["Period 1","Period 12"],pf)+leg;
+document.getElementById("mC2").innerHTML=lc(pa.map(function(v){return ec/12*v}),pb.map(function(v){return el/12*v}),["Period 1","Period 12"])+leg;
+var h=["","M&I %","LY M&I %","+/- Rate","Error Charges","LY Error"],hh=function(x){var a=h.slice();a[0]=x;return a};
+document.getElementById("mDO").innerHTML=tbl(hh("DO"),mg(f,function(s){return DO[s.d]}).map(mRow).join(""));
+document.getElementById("mST").innerHTML=tbl(hh("State"),mg(f,function(s){return s.st}).map(mRow).join(""));
+var impr=f.filter(function(o){return o.mo/o.or<o.moL/o.orL}).length,rt=function(o){return o.mo/o.or},hi=f.slice().sort(function(a,b){return rt(b)-rt(a)}).slice(0,4),lo=f.slice().sort(function(a,b){return rt(a)-rt(b)}).slice(0,4);
+function Lm(a){return a.map(function(o){return o.n+" ("+P(rt(o),2)+")"}).join(", ")}
+document.getElementById("mH").innerHTML="<p>"+(r<rl?"IMPROVING":"WATCH")+" | "+P(r,2)+" of DoorDash orders were missing or incorrect, vs "+P(rl,2)+" last year.</p><ul><li>Cost: "+N(T.mo)+" orders and "+$(ec)+" in error charges ("+(ec-el<0?"-":"+")+$(ec-el)+" vs last year).</li><li>Stores: "+impr+" of "+f.length+" stores improved vs last year.</li><li>Highest M&I (watch): "+Lm(hi)+"</li><li>Lowest M&I: "+Lm(lo)+"</li></ul>"}
+function render(){[renderS,scRender,dRender,cRender,mRender,oRender][pg]();var off=OFF[pg];Object.keys(SELS).forEach(function(k){SELS[k].disabled=off.indexOf(k)>=0})}
+function go(i){pg=i;PG.forEach(function(id,j){document.getElementById(id).hidden=j!==i});Array.prototype.forEach.call(document.getElementById("nav").children,function(b,j){b.setAttribute("aria-selected",j===i)});render()}
+NM.forEach(function(n,i){var b=document.createElement("button");b.type="button";b.textContent=n;b.onclick=function(){go(i)};document.getElementById("nav").appendChild(b)});
+go(0);
+</script>
+</body>
+</html>
